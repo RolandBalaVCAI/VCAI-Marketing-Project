@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(mv:*)",
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:www.streetfighter.com)",
+      "WebFetch(domain:wiki.supercombo.gg)",
+      "Bash(npm run lint)",
+      "WebFetch(domain:ultimateframedata.com)",
+      "Bash(rm:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

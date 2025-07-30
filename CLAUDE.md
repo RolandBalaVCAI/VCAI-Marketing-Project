@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based educational games and utilities collection built with Vite. The project contains multiple interactive applications designed to teach concepts through gamification.
+This is a React-based marketing campaign management system built with Vite. The project provides a comprehensive dashboard for managing marketing campaigns with detailed tracking and analytics.
 
 ## Development Commands
 
@@ -35,29 +35,34 @@ npm run lint
 
 ### Component Structure
 
-The application follows a simple component-swapping pattern where `App.jsx` imports and renders one component at a time. Each component is a self-contained game or utility:
+The application consists of two main components:
 
-- Components are stateful and use React hooks (useState, useEffect)
-- Each component handles its own styling using inline styles
-- No routing system - switching between apps requires manual import changes in App.jsx
-- No shared state management - each component manages its own state
+- **MarketingManagerV4**: The main dashboard component displaying campaign data, KPIs, and navigation
+- **CampaignDetail**: Detailed campaign management interface with editing capabilities, document uploads, and history tracking
+
+Key features:
+- Components use React hooks (useState, useEffect) for state management
+- Inline styling approach for consistent design
+- View-based navigation without routing libraries
+- Comprehensive campaign data structure with history tracking
 
 ### Key Patterns
 
-1. **Inline Styling**: All components use inline styles rather than CSS modules or styled-components
-2. **Self-Contained Components**: Each game/utility is completely independent with no shared dependencies
-3. **Educational Focus**: Components include explanatory text, statistics tracking, and learning outcomes
+1. **Inline Styling**: All components use inline styles for maintainability and consistency
+2. **State Management**: View navigation is handled through state in MarketingManagerV4
+3. **History Tracking**: All campaign changes are logged with timestamps and user information
+4. **File Handling**: Document uploads are handled with FileReader API and base64 encoding
 
-### Adding New Components
+### Development Guidelines
 
-1. Create a new `.jsx` file in `tictactoe-app/src/`
-2. Export as default: `export default ComponentName`
-3. Import in `App.jsx` and replace the current component
-4. Follow existing patterns for inline styling and state management
+1. Campaign data structure includes: name, status, spend, revenue, ROAS, startDate, endDate, manager, adPlacementDomain, device, targeting, repContactInfo, notes, documents, visualMedia
+2. All edits to campaigns are tracked in the changeHistory array
+3. Maintain consistent styling with the existing blue (#0066cc) color scheme
+4. Follow responsive design patterns for mobile compatibility
 
 ## Important Notes
 
 - **No Testing Framework**: The project currently lacks tests. When adding tests, consider installing Vitest for Vite compatibility
-- **Manual App Switching**: To switch between applications, manually edit the import in `App.jsx`
+- **View Navigation**: Navigation between dashboard and campaign detail views is handled through state management
 - **No Environment Variables**: All configuration is hardcoded
 - **Development Port**: Vite dev server runs on http://localhost:5173 by default
