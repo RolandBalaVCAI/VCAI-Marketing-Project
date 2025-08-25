@@ -1,12 +1,13 @@
-import MarketingManagerV4 from './MarketingManagerV4'
-import './App.css'
+import React from 'react';
+import SimpleMarketingManager from './components/SimpleMarketingManager';
+import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <MarketingManagerV4 />
+      <SimpleMarketingManager />
     </div>
-  )
+  );
 }
 
 export default App

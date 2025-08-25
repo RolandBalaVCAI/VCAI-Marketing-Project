@@ -1,0 +1,156 @@
+/* Custom styling for Redoc documentation */
+
+/* Brand colors and theme customization */
+:root {
+  --primary-color: #2563eb;
+  --success-color: #059669;
+  --warning-color: #f59e0b;
+  --error-color: #dc2626;
+  --background-color: #fafafa;
+  --text-color: #1a1a1a;
+  --border-color: #e0e0e0;
+}
+
+/* Custom header styling */
+.redoc-wrap > div[role="navigation"] {
+  border-bottom: 2px solid var(--primary-color);
+}
+
+/* Improve code block styling */
+.redoc-json code {
+  font-family: 'Monaco', 'Consolas', 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Custom button styling */
+button {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Improve table styling */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table th,
+table td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+}
+
+table th {
+  background-color: var(--background-color);
+  font-weight: 600;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 768px) {
+  .redoc-wrap {
+    font-size: 14px;
+  }
+  
+  .api-content {
+    padding: 16px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .redoc-wrap {
+    font-size: 12px;
+  }
+  
+  button,
+  .menu-content {
+    display: none !important;
+  }
+  
+  .api-content {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* Custom loading animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Improve syntax highlighting */
+.token.keyword {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+.token.string {
+  color: #009900;
+}
+
+.token.number {
+  color: #cc6600;
+}
+
+.token.boolean {
+  color: #990099;
+}
+
+/* Custom status code colors */
+.http-verb.get { background-color: var(--success-color); }
+.http-verb.post { background-color: var(--primary-color); }
+.http-verb.put { background-color: var(--warning-color); }
+.http-verb.delete { background-color: var(--error-color); }
+.http-verb.patch { background-color: #6f42c1; }
+
+/* Improve navigation */
+.menu-content {
+  padding-top: 20px;
+}
+
+.menu-content li > label {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+
+/* Add custom branding */
+.redoc-wrap::before {
+  content: "Marketing Dashboard API";
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  background-color: white;
+}

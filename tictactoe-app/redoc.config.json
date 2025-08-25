@@ -1,0 +1,54 @@
+{
+  "theme": {
+    "colors": {
+      "primary": {
+        "main": "#2563eb"
+      },
+      "success": {
+        "main": "#059669"
+      },
+      "warning": {
+        "main": "#f59e0b"
+      },
+      "error": {
+        "main": "#dc2626"
+      }
+    },
+    "typography": {
+      "fontSize": "14px",
+      "lineHeight": "1.5em",
+      "code": {
+        "fontSize": "13px",
+        "fontFamily": "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
+      },
+      "headings": {
+        "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontWeight": "600"
+      }
+    },
+    "sidebar": {
+      "backgroundColor": "#fafafa",
+      "width": "300px"
+    },
+    "rightPanel": {
+      "backgroundColor": "#263238",
+      "width": "40%"
+    }
+  },
+  "scrollYOffset": 60,
+  "hideDownloadButton": false,
+  "disableSearch": false,
+  "hideLoading": false,
+  "nativeScrollbars": false,
+  "requiredPropsFirst": true,
+  "sortPropsAlphabetically": true,
+  "showExtensions": true,
+  "hideSchemaPattern": false,
+  "expandResponses": "200,201",
+  "expandSingleSchemaField": true,
+  "schemaExpansionLevel": 2,
+  "payloadSampleIdx": 0,
+  "menuToggle": true,
+  "hideRequestPayloadSample": false,
+  "sideNavStyle": "summary-only"
+}

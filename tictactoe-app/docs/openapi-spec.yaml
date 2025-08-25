@@ -1,0 +1,1400 @@
+openapi: 3.0.3
+info:
+  title: Marketing Campaign Manager API
+  description: |
+    The Marketing Campaign Manager API provides a comprehensive RESTful interface for managing marketing campaigns. 
+    
+    ## Features
+    - Campaign CRUD operations
+    - Metrics tracking and analytics
+    - Document and media management
+    - Real-time webhooks
+    - Comprehensive error handling
+    - Rate limiting and authentication
+    
+    ## Authentication
+    This API uses Bearer token authentication. Include your API token in the Authorization header:
+    ```
+    Authorization: Bearer YOUR_API_TOKEN
+    ```
+    
+    ## Rate Limits
+    - Default: 1000 requests per hour
+    - Authenticated: 5000 requests per hour
+    - Bulk Operations: 100 requests per hour
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api-support@marketing-campaign-manager.com
+    url: https://docs.marketing-campaign-manager.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.marketing-campaign-manager.com/v1
+    description: Production server
+  - url: https://staging-api.marketing-campaign-manager.com/v1
+    description: Staging server
+  - url: http://localhost:5173/api
+    description: Development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /campaigns:
+    get:
+      summary: List campaigns
+      description: Retrieve a paginated list of campaigns with optional filtering and sorting
+      tags:
+        - Campaigns
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: Filter by campaign status
+          schema:
+            type: string
+            enum: [Active, Paused, Completed, Draft]
+        - name: vendor
+          in: query
+          description: Filter by vendor name
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Filter by start date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Filter by end date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: search
+          in: query
+          description: Search in campaign names and IDs
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [name, startDate, revenue, cost, roas]
+            default: name
+        - name: order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              description: Request limit per hour
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+              description: Remaining requests in current window
+            X-RateLimit-Reset:
+              schema:
+                type: integer
+              description: Unix timestamp when rate limit resets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create campaign
+      description: Create a new marketing campaign
+      tags:
+        - Campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+            examples:
+              basic:
+                summary: Basic campaign
+                value:
+                  name: "Holiday Sale 2024"
+                  vendor: "Google Ads"
+                  status: "Draft"
+                  startDate: "2024-12-01T00:00:00Z"
+                  endDate: "2024-12-31T23:59:59Z"
+                  manager: "John Doe"
+              detailed:
+                summary: Detailed campaign
+                value:
+                  name: "Black Friday 2024"
+                  status: "Active"
+                  vendor: "Facebook Ads"
+                  startDate: "2024-11-25T00:00:00Z"
+                  endDate: "2024-11-30T23:59:59Z"
+                  manager: "Jane Smith"
+                  adPlacementDomain: "shop.example.com"
+                  device: ["desktop", "mobile", "tablet"]
+                  targeting:
+                    interests: ["shopping", "deals", "fashion"]
+                    demographics:
+                      ageRange: "18-65"
+                      gender: "all"
+                    location: ["United States", "Canada"]
+                  repContactInfo:
+                    name: "Mike Johnson"
+                    email: "mike@facebook.com"
+                    phone: "+1-555-9876"
+      responses:
+        '201':
+          description: Campaign created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /campaigns/{campaignId}:
+    get:
+      summary: Get campaign by ID
+      description: Retrieve detailed information about a specific campaign
+      tags:
+        - Campaigns
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update campaign
+      description: Update an existing campaign (partial updates supported)
+      tags:
+        - Campaigns
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+            examples:
+              status_update:
+                summary: Update status
+                value:
+                  status: "Active"
+              metrics_update:
+                summary: Update metrics
+                value:
+                  metrics:
+                    cost: 1500
+                    revenue: 4500
+                    rawClicks: 750
+                    sales: 45
+      responses:
+        '200':
+          description: Campaign updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignUpdateResponse'
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      summary: Delete campaign
+      description: Delete a campaign permanently
+      tags:
+        - Campaigns
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Campaign deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /campaigns/{campaignId}/notes:
+    post:
+      summary: Add note to campaign
+      description: Add a note to a campaign for tracking important information
+      tags:
+        - Campaign Notes
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNoteRequest'
+      responses:
+        '201':
+          description: Note added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+
+  /campaigns/{campaignId}/notes/{noteId}:
+    delete:
+      summary: Delete note
+      description: Delete a specific note from a campaign
+      tags:
+        - Campaign Notes
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+        - name: noteId
+          in: path
+          required: true
+          description: Note ID
+          schema:
+            type: string
+            pattern: '^note_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Note deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+
+  /campaigns/{campaignId}/documents:
+    post:
+      summary: Upload document
+      description: Upload a document to a campaign (base64 encoded)
+      tags:
+        - Campaign Documents
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadDocumentRequest'
+      responses:
+        '201':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentResponse'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /campaigns/{campaignId}/documents/{documentId}:
+    get:
+      summary: Get document
+      description: Download a specific document from a campaign
+      tags:
+        - Campaign Documents
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+        - name: documentId
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            pattern: '^doc_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Document file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+    delete:
+      summary: Delete document
+      description: Delete a document from a campaign
+      tags:
+        - Campaign Documents
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+        - name: documentId
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            pattern: '^doc_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Document deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+
+  /campaigns/{campaignId}/media:
+    post:
+      summary: Add visual media
+      description: Add visual media (images, videos) to a campaign
+      tags:
+        - Campaign Media
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddMediaRequest'
+      responses:
+        '201':
+          description: Media added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaResponse'
+
+  /campaigns/{campaignId}/media/{mediaId}:
+    delete:
+      summary: Delete media
+      description: Remove media from a campaign
+      tags:
+        - Campaign Media
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          description: Campaign ID
+          schema:
+            type: string
+            pattern: '^camp_[a-zA-Z0-9_-]+$'
+        - name: mediaId
+          in: path
+          required: true
+          description: Media ID
+          schema:
+            type: string
+            pattern: '^media_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Media deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+
+  /system/stats:
+    get:
+      summary: Get server statistics
+      description: Get overall system statistics and API health status
+      tags:
+        - System
+      responses:
+        '200':
+          description: System statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatsResponse'
+
+  /system/reset:
+    post:
+      summary: Reset data (Development only)
+      description: Reset all data in the system (Development environment only)
+      tags:
+        - System
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmation:
+                  type: string
+                  enum: ["RESET_ALL_DATA"]
+              required:
+                - confirmation
+      responses:
+        '200':
+          description: Data reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '403':
+          description: Operation not allowed in production
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      summary: Health check
+      description: Simple health check endpoint
+      tags:
+        - System
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /webhooks:
+    get:
+      summary: List webhooks
+      description: List all registered webhooks
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookListResponse'
+
+    post:
+      summary: Register webhook
+      description: Register a webhook endpoint to receive real-time events
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '201':
+          description: Webhook registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+
+  /webhooks/{webhookId}:
+    delete:
+      summary: Delete webhook
+      description: Unregister a webhook
+      tags:
+        - Webhooks
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: Webhook ID
+          schema:
+            type: string
+            pattern: '^webhook_[a-zA-Z0-9_-]+$'
+      responses:
+        '200':
+          description: Webhook deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Campaign:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: '^camp_[a-zA-Z0-9_-]+$'
+          example: "camp_1234567890"
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Summer Sale 2024"
+        status:
+          type: string
+          enum: [Active, Paused, Completed, Draft]
+          example: "Active"
+        vendor:
+          type: string
+          example: "Google Ads"
+        startDate:
+          type: string
+          format: date-time
+          example: "2024-06-01T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2024-08-31T23:59:59Z"
+        manager:
+          type: string
+          example: "John Doe"
+        adPlacementDomain:
+          type: string
+          example: "example.com"
+        device:
+          type: array
+          items:
+            type: string
+            enum: [desktop, mobile, tablet]
+          example: ["desktop", "mobile"]
+        targeting:
+          type: object
+          properties:
+            interests:
+              type: array
+              items:
+                type: string
+              example: ["technology", "shopping"]
+            demographics:
+              type: object
+              properties:
+                ageRange:
+                  type: string
+                  example: "25-54"
+                gender:
+                  type: string
+                  enum: [all, male, female, other]
+                  example: "all"
+            location:
+              type: array
+              items:
+                type: string
+              example: ["United States", "Canada"]
+        repContactInfo:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Jane Smith"
+            email:
+              type: string
+              format: email
+              example: "jane.smith@vendor.com"
+            phone:
+              type: string
+              example: "+1-555-0123"
+        metrics:
+          $ref: '#/components/schemas/CampaignMetrics'
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+        visualMedia:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        changeHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChangeRecord'
+      required:
+        - name
+        - vendor
+        - status
+        - startDate
+        - manager
+
+    CampaignMetrics:
+      type: object
+      properties:
+        cost:
+          type: number
+          format: float
+          minimum: 0
+          example: 5000
+        revenue:
+          type: number
+          format: float
+          minimum: 0
+          example: 15000
+        rawClicks:
+          type: integer
+          minimum: 0
+          example: 10000
+        uniqueClicks:
+          type: integer
+          minimum: 0
+          example: 8000
+        impressions:
+          type: integer
+          minimum: 0
+          example: 100000
+        confirmReg:
+          type: integer
+          minimum: 0
+          example: 500
+        sales:
+          type: integer
+          minimum: 0
+          example: 200
+
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: '^note_[a-zA-Z0-9_-]+$'
+          example: "note_1234567890"
+        text:
+          type: string
+          maxLength: 1000
+          example: "Updated targeting parameters"
+        author:
+          type: string
+          example: "John Doe"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-31T10:45:00Z"
+      required:
+        - text
+        - author
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: '^doc_[a-zA-Z0-9_-]+$'
+          example: "doc_1234567890"
+        name:
+          type: string
+          example: "Q4 Strategy.pdf"
+        type:
+          type: string
+          example: "application/pdf"
+        size:
+          type: integer
+          minimum: 0
+          example: 2048576
+        uploadedBy:
+          type: string
+          example: "John Doe"
+        uploadDate:
+          type: string
+          format: date-time
+          example: "2025-01-31T11:00:00Z"
+        url:
+          type: string
+          format: uri
+          example: "/api/campaigns/camp_1234567890/documents/doc_1234567890"
+      required:
+        - name
+        - type
+        - size
+        - uploadedBy
+
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: '^media_[a-zA-Z0-9_-]+$'
+          example: "media_1234567890"
+        name:
+          type: string
+          example: "Banner Ad v2.jpg"
+        type:
+          type: string
+          example: "image/jpeg"
+        url:
+          type: string
+          format: uri
+          example: "https://cdn.example.com/ads/banner-v2.jpg"
+        thumbnail:
+          type: string
+          format: byte
+          description: Base64 encoded thumbnail
+        uploadedBy:
+          type: string
+          example: "Jane Doe"
+        uploadDate:
+          type: string
+          format: date-time
+          example: "2025-01-31T11:15:00Z"
+      required:
+        - name
+        - type
+        - url
+        - uploadedBy
+
+    ChangeRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "change_1234567890"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-31T12:00:00Z"
+        user:
+          type: string
+          example: "John Doe"
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "status"
+              oldValue:
+                example: "Draft"
+              newValue:
+                example: "Active"
+
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          minimum: 1
+          example: 1
+        totalPages:
+          type: integer
+          minimum: 0
+          example: 10
+        totalItems:
+          type: integer
+          minimum: 0
+          example: 200
+        itemsPerPage:
+          type: integer
+          minimum: 1
+          example: 20
+        hasNextPage:
+          type: boolean
+          example: true
+        hasPreviousPage:
+          type: boolean
+          example: false
+
+    # Request schemas
+    CreateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        status:
+          type: string
+          enum: [Active, Paused, Completed, Draft]
+          default: Draft
+        vendor:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        manager:
+          type: string
+        adPlacementDomain:
+          type: string
+        device:
+          type: array
+          items:
+            type: string
+            enum: [desktop, mobile, tablet]
+        targeting:
+          type: object
+          properties:
+            interests:
+              type: array
+              items:
+                type: string
+            demographics:
+              type: object
+              properties:
+                ageRange:
+                  type: string
+                gender:
+                  type: string
+                  enum: [all, male, female, other]
+            location:
+              type: array
+              items:
+                type: string
+        repContactInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+      required:
+        - name
+        - vendor
+        - startDate
+        - manager
+
+    UpdateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        status:
+          type: string
+          enum: [Active, Paused, Completed, Draft]
+        vendor:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        manager:
+          type: string
+        adPlacementDomain:
+          type: string
+        device:
+          type: array
+          items:
+            type: string
+            enum: [desktop, mobile, tablet]
+        targeting:
+          type: object
+        repContactInfo:
+          type: object
+        metrics:
+          $ref: '#/components/schemas/CampaignMetrics'
+
+    CreateNoteRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          maxLength: 1000
+        author:
+          type: string
+      required:
+        - text
+        - author
+
+    UploadDocumentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        size:
+          type: integer
+          minimum: 0
+          maximum: 10485760  # 10MB
+        data:
+          type: string
+          format: byte
+          description: Base64 encoded file data
+        uploadedBy:
+          type: string
+      required:
+        - name
+        - type
+        - size
+        - data
+        - uploadedBy
+
+    AddMediaRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        url:
+          type: string
+          format: uri
+        thumbnail:
+          type: string
+          format: byte
+          description: Base64 encoded thumbnail
+        uploadedBy:
+          type: string
+      required:
+        - name
+        - type
+        - url
+        - uploadedBy
+
+    CreateWebhookRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - campaign.created
+              - campaign.updated
+              - campaign.deleted
+              - campaign.status_changed
+              - metrics.updated
+              - document.uploaded
+              - media.added
+        secret:
+          type: string
+          minLength: 16
+      required:
+        - url
+        - events
+
+    # Response schemas
+    CampaignListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            campaigns:
+              type: array
+              items:
+                $ref: '#/components/schemas/Campaign'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    CampaignResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            campaign:
+              $ref: '#/components/schemas/Campaign'
+
+    CampaignUpdateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            campaign:
+              $ref: '#/components/schemas/Campaign'
+            changes:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  old:
+                    description: Previous value
+                  new:
+                    description: New value
+
+    NoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            note:
+              $ref: '#/components/schemas/Note'
+
+    DocumentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            document:
+              $ref: '#/components/schemas/Document'
+
+    MediaResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            media:
+              $ref: '#/components/schemas/Media'
+
+    SystemStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalCampaigns:
+              type: integer
+              example: 1523
+            activeCampaigns:
+              type: integer
+              example: 456
+            totalRevenue:
+              type: number
+              format: float
+              example: 2500000
+            totalCost:
+              type: number
+              format: float
+              example: 750000
+            averageROAS:
+              type: number
+              format: float
+              example: 333.33
+            lastUpdated:
+              type: string
+              format: date-time
+              example: "2025-01-31T12:00:00Z"
+            apiVersion:
+              type: string
+              example: "1.0.0"
+            serverTime:
+              type: string
+              format: date-time
+              example: "2025-01-31T12:00:00Z"
+            uptime:
+              type: string
+              example: "15 days, 3:45:22"
+            health:
+              type: object
+              properties:
+                database:
+                  type: string
+                  enum: [healthy, degraded, unhealthy]
+                cache:
+                  type: string
+                  enum: [healthy, degraded, unhealthy]
+                storage:
+                  type: string
+                  enum: [healthy, degraded, unhealthy]
+
+    WebhookListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            webhooks:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+                  events:
+                    type: array
+                    items:
+                      type: string
+                  active:
+                    type: boolean
+                  createdAt:
+                    type: string
+                    format: date-time
+
+    WebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            webhook:
+              type: object
+              properties:
+                id:
+                  type: string
+                url:
+                  type: string
+                  format: uri
+                events:
+                  type: array
+                  items:
+                    type: string
+                active:
+                  type: boolean
+                createdAt:
+                  type: string
+                  format: date-time
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Operation completed successfully"
+            timestamp:
+              type: string
+              format: date-time
+              example: "2025-01-31T12:30:00Z"
+
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Resource deleted successfully"
+            deletedId:
+              type: string
+              example: "camp_1234567890"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "error_1234567890_abc123"
+            category:
+              type: string
+              enum: [network, authentication, authorization, validation, server, client, timeout, rate_limit, maintenance]
+              example: "validation"
+            severity:
+              type: string
+              enum: [low, medium, high, critical]
+              example: "low"
+            message:
+              type: string
+              example: "Please check your input and try again."
+            technicalMessage:
+              type: string
+              example: "Invalid campaign name: must be between 3 and 100 characters"
+            timestamp:
+              type: string
+              format: date-time
+              example: "2025-01-31T10:30:00Z"
+            context:
+              type: object
+              properties:
+                operation:
+                  type: string
+                  example: "createCampaign"
+                requestId:
+                  type: string
+                  example: "req_1234567890_xyz789"
+            isRetryable:
+              type: boolean
+              example: false
+            retryAfter:
+              type: integer
+              description: Seconds to wait before retrying (for rate limit errors)
+              example: 60
+
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                validationErrors:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  example:
+                    name: "Campaign name is required"
+                    vendor: "Vendor is required"

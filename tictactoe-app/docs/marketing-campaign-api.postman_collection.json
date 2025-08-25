@@ -1,0 +1,602 @@
+{
+  "info": {
+    "name": "Marketing Campaign Manager API",
+    "description": "Complete API collection for the Marketing Campaign Manager application. This collection includes all endpoints for managing campaigns, documents, media, and system utilities.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{api_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.marketing-campaign-manager.com/v1",
+      "type": "string"
+    },
+    {
+      "key": "api_token",
+      "value": "your-api-token-here",
+      "type": "string"
+    },
+    {
+      "key": "campaign_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "document_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "media_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Campaign Management",
+      "item": [
+        {
+          "name": "List Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns?page=1&limit=20&status=Active&sort=revenue&order=desc",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page (default: 20, max: 100)"
+                },
+                {
+                  "key": "status",
+                  "value": "Active",
+                  "description": "Filter by status: Active, Paused, Completed, Draft"
+                },
+                {
+                  "key": "vendor",
+                  "value": "",
+                  "description": "Filter by vendor name",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "description": "Filter by start date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "description": "Filter by end date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in campaign names and IDs",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "revenue",
+                  "description": "Sort field: name, startDate, revenue, cost, roas"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Sort order: asc or desc"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of campaigns with optional filtering and sorting"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"campaigns\": [\n      {\n        \"id\": \"camp_1234567890\",\n        \"name\": \"Summer Sale 2024\",\n        \"status\": \"Active\",\n        \"vendor\": \"Google Ads\",\n        \"startDate\": \"2024-06-01T00:00:00Z\",\n        \"endDate\": \"2024-08-31T23:59:59Z\",\n        \"manager\": \"John Doe\",\n        \"metrics\": {\n          \"cost\": 5000,\n          \"revenue\": 15000,\n          \"rawClicks\": 10000,\n          \"uniqueClicks\": 8000,\n          \"impressions\": 100000,\n          \"confirmReg\": 500,\n          \"sales\": 200\n        }\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 10,\n      \"totalItems\": 200,\n      \"itemsPerPage\": 20,\n      \"hasNextPage\": true,\n      \"hasPreviousPage\": false\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Campaign by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Retrieve detailed information about a specific campaign"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"campaign\": {\n      \"id\": \"camp_1234567890\",\n      \"name\": \"Summer Sale 2024\",\n      \"status\": \"Active\",\n      \"vendor\": \"Google Ads\",\n      \"startDate\": \"2024-06-01T00:00:00Z\",\n      \"endDate\": \"2024-08-31T23:59:59Z\",\n      \"manager\": \"John Doe\",\n      \"adPlacementDomain\": \"example.com\",\n      \"device\": [\"desktop\", \"mobile\"],\n      \"targeting\": {\n        \"interests\": [\"technology\", \"shopping\"],\n        \"demographics\": {\n          \"ageRange\": \"25-54\",\n          \"gender\": \"all\"\n        },\n        \"location\": [\"United States\", \"Canada\"]\n      },\n      \"repContactInfo\": {\n        \"name\": \"Jane Smith\",\n        \"email\": \"jane.smith@vendor.com\",\n        \"phone\": \"+1-555-0123\"\n      },\n      \"metrics\": {\n        \"cost\": 5000,\n        \"revenue\": 15000,\n        \"rawClicks\": 10000,\n        \"uniqueClicks\": 8000,\n        \"impressions\": 100000,\n        \"confirmReg\": 500,\n        \"sales\": 200\n      },\n      \"notes\": [],\n      \"documents\": [],\n      \"visualMedia\": [],\n      \"changeHistory\": []\n    }\n  }\n}"
+            },
+            {
+              "name": "Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"category\": \"client\",\n    \"message\": \"Campaign not found\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Black Friday 2024\",\n  \"status\": \"Draft\",\n  \"vendor\": \"Facebook Ads\",\n  \"startDate\": \"2024-11-25T00:00:00Z\",\n  \"endDate\": \"2024-11-30T23:59:59Z\",\n  \"manager\": \"John Doe\",\n  \"adPlacementDomain\": \"shop.example.com\",\n  \"device\": [\"desktop\", \"mobile\", \"tablet\"],\n  \"targeting\": {\n    \"interests\": [\"shopping\", \"deals\"],\n    \"demographics\": {\n      \"ageRange\": \"18-65\",\n      \"gender\": \"all\"\n    },\n    \"location\": [\"United States\"]\n  },\n  \"repContactInfo\": {\n    \"name\": \"Mike Johnson\",\n    \"email\": \"mike@facebook.com\",\n    \"phone\": \"+1-555-9876\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"]
+            },
+            "description": "Create a new marketing campaign"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"campaign\": {\n      \"id\": \"camp_9876543210\",\n      \"name\": \"Black Friday 2024\",\n      \"status\": \"Draft\",\n      \"vendor\": \"Facebook Ads\",\n      \"startDate\": \"2024-11-25T00:00:00Z\",\n      \"endDate\": \"2024-11-30T23:59:59Z\",\n      \"manager\": \"John Doe\",\n      \"adPlacementDomain\": \"shop.example.com\",\n      \"device\": [\"desktop\", \"mobile\", \"tablet\"],\n      \"targeting\": {\n        \"interests\": [\"shopping\", \"deals\"],\n        \"demographics\": {\n          \"ageRange\": \"18-65\",\n          \"gender\": \"all\"\n        },\n        \"location\": [\"United States\"]\n      },\n      \"repContactInfo\": {\n        \"name\": \"Mike Johnson\",\n        \"email\": \"mike@facebook.com\",\n        \"phone\": \"+1-555-9876\"\n      },\n      \"metrics\": {\n        \"cost\": 0,\n        \"revenue\": 0,\n        \"rawClicks\": 0,\n        \"uniqueClicks\": 0,\n        \"impressions\": 0,\n        \"confirmReg\": 0,\n        \"sales\": 0\n      },\n      \"notes\": [],\n      \"documents\": [],\n      \"visualMedia\": [],\n      \"changeHistory\": []\n    }\n  }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"category\": \"validation\",\n    \"message\": \"Validation failed\",\n    \"validationErrors\": {\n      \"name\": \"Campaign name is required\",\n      \"vendor\": \"Vendor is required\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Active\",\n  \"metrics\": {\n    \"cost\": 1000,\n    \"revenue\": 3000,\n    \"rawClicks\": 500,\n    \"sales\": 25\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Update an existing campaign (partial updates supported)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"campaign\": {\n      \"id\": \"camp_1234567890\",\n      \"name\": \"Summer Sale 2024\",\n      \"status\": \"Active\",\n      \"vendor\": \"Google Ads\",\n      \"metrics\": {\n        \"cost\": 1000,\n        \"revenue\": 3000,\n        \"rawClicks\": 500,\n        \"sales\": 25\n      }\n    },\n    \"changes\": {\n      \"status\": {\n        \"old\": \"Draft\",\n        \"new\": \"Active\"\n      },\n      \"metrics.cost\": {\n        \"old\": 0,\n        \"new\": 1000\n      },\n      \"metrics.revenue\": {\n        \"old\": 0,\n        \"new\": 3000\n      }\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Delete a campaign permanently"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Campaign deleted successfully\",\n    \"deletedId\": \"camp_1234567890\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Campaign Notes",
+      "item": [
+        {
+          "name": "Add Note to Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Updated targeting parameters based on Q3 performance analysis. Focusing on mobile users aged 25-34.\",\n  \"author\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/notes",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "notes"]
+            },
+            "description": "Add a note to a campaign for tracking important information"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"note\": {\n      \"id\": \"note_1234567890\",\n      \"text\": \"Updated targeting parameters based on Q3 performance analysis. Focusing on mobile users aged 25-34.\",\n      \"author\": \"John Doe\",\n      \"timestamp\": \"2025-01-31T10:45:00Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Note",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/notes/{{note_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "notes", "{{note_id}}"]
+            },
+            "description": "Delete a specific note from a campaign"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaign Documents",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q4 Strategy.pdf\",\n  \"type\": \"application/pdf\",\n  \"size\": 2048576,\n  \"data\": \"JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nGWPwQrCMBBE7/mK...\",\n  \"uploadedBy\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/documents",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "documents"]
+            },
+            "description": "Upload a document to a campaign (base64 encoded)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"document\": {\n      \"id\": \"doc_1234567890\",\n      \"name\": \"Q4 Strategy.pdf\",\n      \"type\": \"application/pdf\",\n      \"size\": 2048576,\n      \"uploadedBy\": \"John Doe\",\n      \"uploadDate\": \"2025-01-31T11:00:00Z\",\n      \"url\": \"/api/campaigns/camp_1234567890/documents/doc_1234567890\"\n    }\n  }\n}"
+            },
+            {
+              "name": "File Too Large",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"category\": \"validation\",\n    \"message\": \"File size exceeds maximum limit of 10MB\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/documents/{{document_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "documents", "{{document_id}}"]
+            },
+            "description": "Download a specific document from a campaign"
+          }
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/documents/{{document_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "documents", "{{document_id}}"]
+            },
+            "description": "Delete a document from a campaign"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaign Media",
+      "item": [
+        {
+          "name": "Add Visual Media",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Banner Ad v2.jpg\",\n  \"type\": \"image/jpeg\",\n  \"url\": \"https://cdn.example.com/ads/banner-v2.jpg\",\n  \"thumbnail\": \"/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABkAGQDASIAAhEBAxEB/8QAHAAAAgMBAQEBAAAAAAAAAAAABQYDBAcCAQAI/9QAORAAA...\",\n  \"uploadedBy\": \"Jane Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/media",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "media"]
+            },
+            "description": "Add visual media (images, videos) to a campaign"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"media\": {\n      \"id\": \"media_1234567890\",\n      \"name\": \"Banner Ad v2.jpg\",\n      \"type\": \"image/jpeg\",\n      \"url\": \"https://cdn.example.com/ads/banner-v2.jpg\",\n      \"thumbnail\": \"/9j/4AAQSkZJRgABAQEASABIAAD/...\",\n      \"uploadedBy\": \"Jane Doe\",\n      \"uploadDate\": \"2025-01-31T11:15:00Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Media",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/media/{{media_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "media", "{{media_id}}"]
+            },
+            "description": "Remove media from a campaign"
+          }
+        }
+      ]
+    },
+    {
+      "name": "System Utilities",
+      "item": [
+        {
+          "name": "Get Server Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/system/stats",
+              "host": ["{{base_url}}"],
+              "path": ["system", "stats"]
+            },
+            "description": "Get overall system statistics and API health status"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalCampaigns\": 1523,\n    \"activeCampaigns\": 456,\n    \"totalRevenue\": 2500000,\n    \"totalCost\": 750000,\n    \"averageROAS\": 333.33,\n    \"lastUpdated\": \"2025-01-31T12:00:00Z\",\n    \"apiVersion\": \"1.0.0\",\n    \"serverTime\": \"2025-01-31T12:00:00Z\",\n    \"uptime\": \"15 days, 3:45:22\",\n    \"health\": {\n      \"database\": \"healthy\",\n      \"cache\": \"healthy\",\n      \"storage\": \"healthy\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reset Data (Dev Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmation\": \"RESET_ALL_DATA\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/system/reset",
+              "host": ["{{base_url}}"],
+              "path": ["system", "reset"]
+            },
+            "description": "Reset all data in the system (Development environment only)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"All data has been reset successfully\",\n    \"timestamp\": \"2025-01-31T12:30:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Production Error",
+              "status": "Forbidden",
+              "code": 403,
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"category\": \"authorization\",\n    \"message\": \"Data reset is not allowed in production environment\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Simple health check endpoint"
+          },
+          "response": [
+            {
+              "name": "Healthy",
+              "status": "OK",
+              "code": 200,
+              "header": [],
+              "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"2025-01-31T12:00:00Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Register Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://your-app.com/webhooks/campaigns\",\n  \"events\": [\n    \"campaign.created\",\n    \"campaign.updated\",\n    \"campaign.status_changed\",\n    \"metrics.updated\"\n  ],\n  \"secret\": \"your_webhook_secret_key_here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/webhooks",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks"]
+            },
+            "description": "Register a webhook endpoint to receive real-time events"
+          }
+        },
+        {
+          "name": "List Webhooks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/webhooks",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks"]
+            },
+            "description": "List all registered webhooks"
+          }
+        },
+        {
+          "name": "Delete Webhook",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/webhooks/{{webhook_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "{{webhook_id}}"]
+            },
+            "description": "Unregister a webhook"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Add timestamp to all requests",
+          "pm.request.headers.add({",
+          "    key: 'X-Request-Time',",
+          "    value: new Date().toISOString()",
+          "});",
+          "",
+          "// Add request ID for tracing",
+          "pm.request.headers.add({",
+          "    key: 'X-Request-ID',",
+          "    value: 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9)",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Log response time",
+          "console.log('Response time: ' + pm.response.responseTime + 'ms');",
+          "",
+          "// Check for rate limit headers",
+          "if (pm.response.headers.has('X-RateLimit-Remaining')) {",
+          "    const remaining = pm.response.headers.get('X-RateLimit-Remaining');",
+          "    console.log('Rate limit remaining: ' + remaining);",
+          "    ",
+          "    if (parseInt(remaining) < 100) {",
+          "        console.warn('Warning: Low rate limit remaining!');",
+          "    }",
+          "}",
+          "",
+          "// Store campaign ID from create response",
+          "if (pm.request.method === 'POST' && pm.request.url.getPath() === '/campaigns') {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.data && jsonData.data.campaign) {",
+          "        pm.collectionVariables.set('campaign_id', jsonData.data.campaign.id);",
+          "        console.log('Stored campaign ID: ' + jsonData.data.campaign.id);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}

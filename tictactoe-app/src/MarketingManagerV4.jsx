@@ -5,12 +5,8 @@ import {
 } from 'lucide-react';
 import { format, subDays, isWithinInterval, parseISO } from 'date-fns';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import CampaignDetail from './CampaignDetail';
 
 const MarketingManagerV4 = () => {
-  // View state management
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
   // Mock data generation (same as original)
   const generateMockData = () => {
     const vendors = ['AdTech Solutions', 'MediaBuy Pro', 'Email Dynamics', 'SearchMax', 'Partner Network', 'Display Central', 'Social Media Hub'];
@@ -56,40 +52,7 @@ const MarketingManagerV4 = () => {
           status: statuses[Math.floor(Math.random() * statuses.length)],
           startDate: format(startDate, 'yyyy-MM-dd'),
           endDate: format(endDate, 'yyyy-MM-dd'),
-          metrics: { rawClicks, uniqueClicks, cost, rawReg, confirmReg, sales, orderValue, revenue, ltrev },
-          manager: ['John Smith', 'Sarah Johnson', 'Mike Chen', 'Emily Davis', 'Unassigned'][Math.floor(Math.random() * 5)],
-          adPlacementDomain: ['google.com', 'facebook.com', 'amazon.com', 'youtube.com', 'linkedin.com', 'twitter.com', 'reddit.com', 'news.com'][Math.floor(Math.random() * 8)],
-          device: ['Desktop', 'Mobile', 'Both'][Math.floor(Math.random() * 3)],
-          targeting: ['United States', 'Canada', 'United Kingdom', 'Europe', 'Asia Pacific', 'Global', 'North America', 'Latin America'][Math.floor(Math.random() * 8)],
-          repContactInfo: `${vendor} Rep - ${['rep@', 'contact@', 'support@'][Math.floor(Math.random() * 3)]}${vendor.toLowerCase().replace(' ', '')}.com`,
-          notes: [],
-          documents: [],
-          visualMedia: (() => {
-            // Generate 1-3 sample media items for some campaigns
-            const mediaCount = Math.random() > 0.5 ? Math.floor(Math.random() * 3) + 1 : 0;
-            const mediaItems = [];
-            const bannerSizes = ['728x90', '300x250', '336x280', '300x600', '320x50', '468x60'];
-            const mediaTypes = ['Banner', 'Display Ad', 'Rich Media', 'Video Thumbnail'];
-            
-            for (let i = 0; i < mediaCount; i++) {
-              mediaItems.push({
-                id: Date.now() + i + Math.random(),
-                url: `https://via.placeholder.com/${bannerSizes[Math.floor(Math.random() * bannerSizes.length)]}`,
-                description: `${mediaTypes[Math.floor(Math.random() * mediaTypes.length)]} - ${bannerSizes[Math.floor(Math.random() * bannerSizes.length)]}`,
-                addedDate: startDate.toISOString(),
-                addedBy: 'System'
-              });
-            }
-            return mediaItems;
-          })(),
-          history: [{
-            id: Date.now(),
-            action: 'Campaign created',
-            user: 'System',
-            timestamp: startDate.toISOString()
-          }],
-          createdAt: startDate.toISOString(),
-          modifiedAt: startDate.toISOString()
+          metrics: { rawClicks, uniqueClicks, cost, rawReg, confirmReg, sales, orderValue, revenue, ltrev }
         });
         
         campaignId++;
@@ -501,42 +464,6 @@ const MarketingManagerV4 = () => {
   const totalPages = Math.ceil(filteredCampaigns.length / campaignsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Campaign handlers
-  const handleCampaignClick = (campaign) => {
-    setSelectedCampaign(campaign);
-    setCurrentView('detail');
-  };
-
-  const handleCampaignSave = (updatedCampaign) => {
-    const updatedCampaigns = campaigns.map(c => 
-      c.id === updatedCampaign.id ? updatedCampaign : c
-    );
-    setCampaigns(updatedCampaigns);
-    
-    // Update filtered campaigns as well
-    const updatedFiltered = filteredCampaigns.map(c => 
-      c.id === updatedCampaign.id ? updatedCampaign : c
-    );
-    setFilteredCampaigns(updatedFiltered);
-  };
-
-  const handleBackToDashboard = () => {
-    setCurrentView('dashboard');
-    setSelectedCampaign(null);
-  };
-
-  // Render campaign detail view if selected
-  if (currentView === 'detail' && selectedCampaign) {
-    return (
-      <CampaignDetail
-        campaign={selectedCampaign}
-        onBack={handleBackToDashboard}
-        onSave={handleCampaignSave}
-        currentUser="Marketing Manager"
-      />
-    );
-  }
 
   return (
     <div style={{
@@ -951,7 +878,7 @@ const MarketingManagerV4 = () => {
               marginBottom: '12px'
             }}>
               <TrendingUp size={20} style={{ marginRight: '8px', color: overallROI >= 0 ? '#059669' : '#dc2626' }} />
-              <span style={{ color: '#666666', fontSize: '14px', fontWeight: '500' }}>Overall ROAS</span>
+              <span style={{ color: '#666666', fontSize: '14px', fontWeight: '500' }}>Overall ROI</span>
             </div>
             <div style={{ color: overallROI >= 0 ? '#059669' : '#dc2626', fontSize: getResponsiveFontSize('1.5rem', '2rem'), fontWeight: '600' }}>
               {overallROI}%
@@ -1211,11 +1138,8 @@ const MarketingManagerV4 = () => {
                   const roi = calculateROI(campaign.metrics.revenue, campaign.metrics.cost);
                   return (
                     <tr key={campaign.id} style={{
-                      borderBottom: index < currentCampaigns.length - 1 ? '1px solid #f0f0f0' : 'none',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
+                      borderBottom: index < currentCampaigns.length - 1 ? '1px solid #f0f0f0' : 'none'
                     }}
-                    onClick={() => handleCampaignClick(campaign)}
                     onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#fafafa'}
                     onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = 'transparent'}
                     >
@@ -1234,7 +1158,7 @@ const MarketingManagerV4 = () => {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
                       }}>
-                        <div style={{ fontWeight: '600', marginBottom: '2px', color: '#2563eb' }}>{campaign.name}</div>
+                        <div style={{ fontWeight: '600', marginBottom: '2px' }}>{campaign.name}</div>
                         <div style={{ fontSize: '12px', color: '#666666', fontWeight: '400' }}>{campaign.id}</div>
                       </td>
                       <td style={{ padding: '16px 20px' }}>
