@@ -34,8 +34,13 @@
       "Bash(npm run docs:deploy-build:*)",
       "Bash(node:*)",
       "Bash(npm run generate:api:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(xcopy:*)",
+      "Bash(powershell:*)"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "C:\\Users\\Roland\\Desktop\\VCAI\\VCAI gitdatawarehouse"
+    ]
   }
 }

@@ -1,0 +1,69 @@
+{
+  "name": "vcai-marketing-project",
+  "version": "1.0.0",
+  "description": "Unified marketing campaign management system with React frontend and Python data warehouse",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python api_bridge.py",
+    "dev:mock": "cd frontend && VITE_USE_MOCK=true npm run dev",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && python -m pytest",
+    "test:integration": "npm run test:frontend && npm run test:backend",
+    "lint": "npm run lint:frontend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "setup": "npm run setup:frontend && npm run setup:backend",
+    "setup:frontend": "cd frontend && npm install",
+    "setup:backend": "cd backend && pip install -r requirements.txt",
+    "sync": "cd backend && python main.py sync",
+    "export": "cd backend && python main.py export --format csv",
+    "status": "cd backend && python main.py status --detailed",
+    "start:prod": "concurrently \"npm run start:backend:prod\" \"npm run start:frontend:prod\"",
+    "start:backend:prod": "cd backend && python api_bridge.py",
+    "start:frontend:prod": "cd frontend && npm run build && npm run preview",
+    "clean": "npm run clean:frontend && npm run clean:backend",
+    "clean:frontend": "cd frontend && rm -rf node_modules dist",
+    "clean:backend": "cd backend && rm -rf __pycache__ *.pyc .pytest_cache",
+    "reset:data": "cd frontend && npm run reset:data",
+    "backup:db": "cd backend && cp datawarehouse.db backups/datawarehouse_$(date +%Y%m%d_%H%M%S).db"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RolandBalaVCAI/VCAI-Marketing-Project.git"
+  },
+  "keywords": [
+    "marketing",
+    "campaigns",
+    "analytics",
+    "react",
+    "python",
+    "fastapi",
+    "data-warehouse",
+    "peach-ai",
+    "dashboard"
+  ],
+  "author": {
+    "name": "Roland Bala",
+    "email": "roland@vcai.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RolandBalaVCAI/VCAI-Marketing-Project/issues"
+  },
+  "homepage": "https://github.com/RolandBalaVCAI/VCAI-Marketing-Project#readme"
+}
