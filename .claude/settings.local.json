@@ -36,7 +36,8 @@
       "Bash(npm run generate:api:*)",
       "Bash(taskkill:*)",
       "Bash(xcopy:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npm update:*)"
     ],
     "deny": [],
     "additionalDirectories": [

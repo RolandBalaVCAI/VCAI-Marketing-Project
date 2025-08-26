@@ -54,19 +54,30 @@ export const useCampaignsStore = create(
       
       // Actions
       
-      // Fetch campaigns with filters
-      fetchCampaigns: createAsyncAction('FETCH_CAMPAIGNS', async (filters = {}, { set, get }) => {
+      // Fetch campaigns with filters  
+      fetchCampaigns: async (filters = {}) => {
+        set({ isLoading: true }, false, 'FETCH_CAMPAIGNS_START');
+        
         try {
           const response = await apiClient.getCampaigns(filters);
           
+          console.log('📦 Raw API response:', response);
+          
           if (response.success) {
+            console.log('✅ Setting campaigns in store:', {
+              campaignCount: response.data?.length || 0,
+              totalCampaigns: response.meta?.total || 0,
+              firstCampaign: response.data?.[0]?.name || 'None'
+            });
+            
             set({
-              campaigns: response.data,
-              totalCampaigns: response.meta.total,
-              currentPage: response.meta.page,
-              totalPages: response.meta.pages,
-              hasNextPage: response.meta.hasNext,
-              hasPreviousPage: response.meta.hasPrev,
+              campaigns: response.data || [],
+              totalCampaigns: response.meta?.total || 0,
+              currentPage: response.meta?.page || 1,
+              totalPages: response.meta?.pages || 1,
+              hasNextPage: response.meta?.hasNext || false,
+              hasPreviousPage: response.meta?.hasPrev || false,
+              isLoading: false,
               error: null
             }, false, 'FETCH_CAMPAIGNS_SUCCESS');
             
@@ -75,8 +86,10 @@ export const useCampaignsStore = create(
             throw response.error;
           }
         } catch (error) {
+          console.error('❌ fetchCampaigns error:', error);
           set({ 
             campaigns: [],
+            isLoading: false,
             error: {
               message: error.message || 'Failed to fetch campaigns',
               code: error.code || 'FETCH_ERROR',
@@ -85,7 +98,7 @@ export const useCampaignsStore = create(
           }, false, 'FETCH_CAMPAIGNS_ERROR');
           throw error;
         }
-      }),
+      },
       
       // Fetch single campaign
       fetchCampaignById: createAsyncAction('FETCH_CAMPAIGN', async (id, { set, get }) => {

@@ -198,10 +198,15 @@ class APIClientWrapper {
 
   // Campaign endpoints with smart fallback
   async getCampaigns(params = {}) {
+    console.log('🚀 getCampaigns called with params:', params);
     const useMock = await this.shouldUseMock();
+    console.log('🎭 Using mock API:', useMock);
     
     if (useMock) {
-      return this.campaigns.getCampaigns(params);
+      console.log('📁 Calling mock API getCampaigns...');
+      const result = await this.campaigns.getCampaigns(params);
+      console.log('📋 Mock API result:', result);
+      return result;
     }
     
     try {

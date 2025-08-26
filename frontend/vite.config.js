@@ -52,9 +52,13 @@ export default defineConfig({
   
   // Development optimizations
   server: {
+    port: 5173,
+    host: true, // Allow external connections
+    strictPort: false, // Allow port fallback
     hmr: {
       overlay: true
-    }
+    },
+    open: false // Don't auto-open browser
   },
   
   // Enable tree shaking
