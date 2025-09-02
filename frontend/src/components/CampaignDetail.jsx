@@ -16,9 +16,9 @@ import { formatDateTime, getRelativeTime } from '../utils/dateHelpers';
 
 import ErrorBoundary from './common/ErrorBoundary';
 
-const CampaignDetail = ({ campaign }) => {
+const CampaignDetail = ({ campaign, onBack }) => {
   // Hooks
-  const campaignDetail = useCampaignDetail(campaign);
+  const campaignDetail = useCampaignDetail(campaign, onBack);
   const notes = useNotes(campaign?.id);
   const documents = useDocuments(campaign?.id);
   const visualMedia = useVisualMedia(campaign?.id);

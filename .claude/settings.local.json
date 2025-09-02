@@ -37,7 +37,8 @@
       "Bash(taskkill:*)",
       "Bash(xcopy:*)",
       "Bash(powershell:*)",
-      "Bash(npm update:*)"
+      "Bash(npm update:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "additionalDirectories": [

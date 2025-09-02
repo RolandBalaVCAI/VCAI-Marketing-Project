@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useCampaignsStore } from '../stores/campaignsStore';
 import { useUIStore } from '../stores/uiStore';
 
-export const useCampaignDetail = (campaign) => {
+export const useCampaignDetail = (campaign, onBack) => {
   const {
     selectedCampaign,
     isUpdating,
@@ -112,12 +112,20 @@ export const useCampaignDetail = (campaign) => {
   const goBack = useCallback(() => {
     if (isEditing && hasUnsavedChanges()) {
       if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
-        setCurrentView('dashboard');
+        if (onBack) {
+          onBack();
+        } else {
+          setCurrentView('dashboard');
+        }
       }
     } else {
-      setCurrentView('dashboard');
+      if (onBack) {
+        onBack();
+      } else {
+        setCurrentView('dashboard');
+      }
     }
-  }, [isEditing, setCurrentView]);
+  }, [isEditing, onBack, setCurrentView, editedData, originalData]);
   
   // Helper functions
   const hasUnsavedChanges = () => {
